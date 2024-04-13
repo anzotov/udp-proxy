@@ -4,7 +4,7 @@ from time import sleep
 
 
 def main():
-    client_addr = "192.168.0.10", 3333
+    client_addr = ["192.168.0.10", 0]
     win_addr = "192.168.0.11", 3333
     win_wsl_addr = "172.18.224.1", 3334
     linux_wsl_addr = "172.18.234.41", 3333
@@ -24,6 +24,8 @@ def main():
             with client_socket_lock:
                 try:
                     data, addr = client_socket.recvfrom(4096)
+                    if addr[0] == client_addr[0]:
+                        client_addr[1] = addr[1]
                 except:
                     sleep(0.1)
             if data and addr[0] == client_addr[0]:
@@ -44,7 +46,7 @@ def main():
                     sleep(0.1)
             if data and addr == linux_wsl_addr:
                 with client_socket_lock:
-                    client_socket.sendto(data, client_addr)
+                    client_socket.sendto(data, tuple(client_addr))
             with run_lock:
                 if not run:
                     break
